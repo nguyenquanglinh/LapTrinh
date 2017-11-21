@@ -98,13 +98,20 @@
     <None Include="bin\Debug\Resources\1.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="bin\Debug\Resources\2.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="bin\Debug\Resources\ad.jpg" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="bin\Debug\Resources\3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\2.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\3.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

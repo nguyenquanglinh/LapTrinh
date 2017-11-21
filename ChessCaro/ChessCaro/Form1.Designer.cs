@@ -83,6 +83,7 @@
             // 
             // ptbPlayer
             // 
+            this.ptbPlayer.Image = global::ChessCaro.Properties.Resources.ad1;
             this.ptbPlayer.Location = new System.Drawing.Point(112, 4);
             this.ptbPlayer.Name = "ptbPlayer";
             this.ptbPlayer.Size = new System.Drawing.Size(63, 50);
