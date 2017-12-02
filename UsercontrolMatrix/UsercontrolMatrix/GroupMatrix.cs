@@ -36,8 +36,10 @@ namespace UsercontrolMatrix
         private void groupBoxMatrix_Enter(object sender, EventArgs e)
         {
         }
+     
         TextBox[,] arr;
         string ten;
+
         [Browsable(true)]
         public string Ten
         {

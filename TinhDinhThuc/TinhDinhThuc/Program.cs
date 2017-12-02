@@ -70,10 +70,11 @@ namespace TinhDinhThuc
                 {
                     var arDuoi = LayCacGiaTriHangThuN(arr, j);
                     double thuong = arDuoi[i] * 1.0 / arTren[i];
-                    for (int k = 0; k < arr.GetLength(1); k++)
+                    for (int k = i; k < arr.GetLength(1); k++)
                     {
-                        arr[j, k] = (arTren[k] * thuong - arDuoi[k]);
+                        arr[j, k] = (arDuoi[k] - arTren[k] * thuong);
                     }
+                    Xuat(arr);
                 }
 
             }
@@ -127,12 +128,13 @@ namespace TinhDinhThuc
             ////Nhap(arr);
             // Xuat(arr);
             // var arr1 = new double[6, 6] { { 4, 4, -1, 0, -1, 8 }, { 2, 3, 7, 5, 2, 3 }, { 3, 2, 5, 7, 3, 2 }, { 1, 2, 2, 1, 1, 2, }, { 1, 7, 6, 6, 5, 7 }, { 2, 1, 1, 2, 2, 1 } };
-     //       var arr1 = new double[4, 4] { { 3, 2, 3, 6 }, { 2, 3, 6, 3 }, { 3, 6, 3, 2 }, { 6, 3, 2, 3 } };
-            var arr1 = new double[4, 4] { { 1001, 1002, 1003, 1004 }, { 1002, 1003, 1001, 1002 }, { 1001, 1000, 1001, 999 }, { 1001, 1000, 998, 999 } };
+            //       var arr1 = new double[4, 4] { { 3, 2, 3, 6 }, { 2, 3, 6, 3 }, { 3, 6, 3, 2 }, { 6, 3, 2, 3 } };
+           // var arr1 = new double[4, 4] { { 1001, 1002, 1003, 1004 }, { 1002, 1003, 1001, 1002 }, { 1001, 1000, 1001, 999 }, { 1001, 1000, 998, 999 } };
+            var arr1 = new double[2, 2] { { 1, 2 }, { 3, 4 } };
             TinhGiaTriTamGiacDuocbang0(arr1);
             KtCacHangKhac0(arr1);
             Xuat(arr1);
-            double x = 1;
+            double x = 1, dem = 0;
             for (int i = 0; i < arr1.GetLength(0); i++)
             {
                 for (int j = 0; j < arr1.GetLength(1); j++)
@@ -140,12 +142,14 @@ namespace TinhDinhThuc
                     if (i == j)
                     {
                         x = x * arr1[i, j] * 1.0;
-                        Console.WriteLine(x);
+                        break;
+
                     }
+                    dem++;
                 }
-                Console.WriteLine(x);
-                Console.ReadLine();
             }
+            Console.WriteLine(x);
+            Console.ReadKey();
         }
     }
 }

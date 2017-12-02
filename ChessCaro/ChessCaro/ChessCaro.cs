@@ -53,7 +53,7 @@ namespace ChessCaro
             this.Listplayer = new List<Player>();
             PlayerText = textPlayer;
             ImagePlayer = imagePlayer;
-            Listplayer.Add(new Player("abc", Image.FromFile(Application.StartupPath + "\\Resources\\1.png")));
+            Listplayer.Add(new Player("abc ", Image.FromFile(Application.StartupPath + "\\Resources\\1.png")));
             Listplayer.Add(new Player("addc", Image.FromFile(Application.StartupPath + "\\Resources\\3.png")));
             playerNewPerson = 0;
             changePlayer(); 
@@ -64,7 +64,7 @@ namespace ChessCaro
         public int PlayerNewPerson
         {
             get { return playerNewPerson; }
-            set { playerNewPerson = value; }
+            set { playerNewPerson = v                        alue; }
         }
         int ox, oy;
 

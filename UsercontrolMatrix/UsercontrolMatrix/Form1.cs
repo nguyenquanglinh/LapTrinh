@@ -24,7 +24,7 @@ namespace UsercontrolMatrix
             var n = int.Parse(txtCot.Text);
             groupMatrix1.Enabled = true;
             groupMatrix2.Enabled = true;
-            groupMatrix1.GanGiaTri(new int[m,n]);
+            groupMatrix1.(new int[m,n]);
             groupMatrix2.GanGiaTri(new int[m, n]);
             comboBox1.Enabled = true;
         }
