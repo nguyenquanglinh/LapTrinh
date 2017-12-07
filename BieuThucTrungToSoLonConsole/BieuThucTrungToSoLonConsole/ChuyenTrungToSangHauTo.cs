@@ -13,19 +13,28 @@ namespace BieuThucTrungToSoLonConsole
         private static List<object> SplitItem(string str)
         {
             string[] sep = { "+", "-", "*", ")", "(", "^", "/" };
-
             foreach (var item in sep)
             {
                 str = str.Replace(item, " " + item + " ");
             }
             var arr = str.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             var result = new List<object>();
+            int demToanTu = 0;
+            int demSoLon = 0;
             foreach (var item in arr)
             {
                 if ('0' <= item[0] && item[0] <= '9')
+                {
+                    demSoLon++;
                     result.Add(new SoLon(item));
+                }
                 else
+                {
                     result.Add(item);
+                    demToanTu++;
+                }
+                if (demSoLon -1< demToanTu)
+                    return null;
             }
             return result;
         }
@@ -34,11 +43,11 @@ namespace BieuThucTrungToSoLonConsole
         public ChuyenTrungToSangHauTo(string s)
         {
             if (!IsCorrectString(s))
-                throw new ArgumentException("Chuoi khong hop le");
+                throw new ArgumentException("Chuỗi không hợp lệ");
             items = SplitItem(s);
+            if (items == null)
+                throw new Exception("các toán tử đang nhiều hơn các số hạng ");
         }
-
-
         //kiểm tra chuỗi đúng
         static bool IsCorrectString(string mangChar)
         {
@@ -54,9 +63,8 @@ namespace BieuThucTrungToSoLonConsole
             }
             return mo - dong == 0;
         }
-
         //độ ưu tiên toán tử
-        static int Priority(string Char)
+        int Priority(string Char)
         {
             if (Char == "%" || Char == "^")
                 return 3;
@@ -72,7 +80,7 @@ namespace BieuThucTrungToSoLonConsole
         {
             List<object> result = new List<object>();
             var stack = new Stack<object>();
-            var ressults = "";
+
             foreach (var item in items)
             {
                 if (item == "(")
@@ -89,92 +97,52 @@ namespace BieuThucTrungToSoLonConsole
                         kqTrongStack = stack.Pop();
                     }
                 }
-                else if (IsOperator(item))
+                else if (item is string)
                 {
 
-                    while (stack.Count > 0 && Priority(item) <= Priority((char)stack.Peek()))
+                    while (stack.Count > 0 && Priority((string)item) <= Priority((string)stack.Peek()))
                     {
-                        ressults += stack.Pop();
+                        result.Add(stack.Pop());
                     }
                     stack.Push(item);
                 }
+                else
+                    result.Add(item);
             }
             while (stack.Count > 0)
             {
-                ressults += stack.Pop();
+                result.Add(stack.Pop());
             }
-            var s = ressults.ToCharArray();
-            ressults = ChuyenVeChuoiDung(s);
-            return ressults;
+            return result;
         }
 
-        string ChuyenVeChuoiDung(char[] ressults)
+        //////phep toan ket qua
+        void StackPusk(Stack<object> obj, string x)
         {
-            string[] toanTu = { "+", "-", "*", "(", ")", "^", "/" };
-            var cacSoLon = chuoi.Split(toanTu, StringSplitOptions.RemoveEmptyEntries);
-            var ressults1 = "";
-            var s = "";
-            int j = 0;
-            foreach (var item in ressults)
-            {
-                s += item;
-                if (IsOperator(item))
-                {
-                    ressults1 += " " + item;
-                    s = "";
-                }
-                else if (s == cacSoLon[j])
-                {
-                    ressults1 += " " + s + " ";
-                    s = "";
-                    j++;
-                }
-            }
-            return ressults1;
+            var x1 = (SoLon)obj.Pop();
+            var x2 = (SoLon)obj.Pop();
+            if (x == "+")
+                obj.Push(x1 + x2);
+            else if (x == "-")
+                obj.Push(x2 - x1);
+            else if (x == "*")
+                obj.Push(x1 * x2);
         }
 
-        ////phep toan ket qua
         public string Expressions()
         {
             var s = PrintScreenRessults();
             var stack = new Stack<object>();
-            foreach (var item in s.Split(' '))
+            foreach (var item in s)
             {
-                if (item == "")
-                    continue;
-                if (IsOperatorString(item))
+                if (item is string)
                 {
-                    if (item == "+")
-                    {
-                        var x1 = (SoLon)stack.Pop();
-                        var x2 = (SoLon)stack.Pop();
-                        var x3 = x1 + x2;
-                        stack.Push(x3);
-                    }
-                    else if (item == "-")
-                    {
-                        var x1 = (SoLon)stack.Pop();
-                        var x2 = (SoLon)stack.Pop();
-                        var x3 = x2 - x1;
-                        stack.Push(x3);
-                    }
-                    else if (item == "*")
-                    {
-                        var x1 = (SoLon)stack.Pop();
-                        var x2 = (SoLon)stack.Pop();
-                        var x3 = x1 * x2;
-                        stack.Push(x3);
-                    }
-                    else if (item == "^")
-                    {
-                        var x1 = (SoLon)stack.Pop();
-                        var x2 = (SoLon)stack.Pop();
-                        var x3 = x2 ^ x1;
-                        stack.Push(x3);
-                    }
+                    var x = item as string;
+                    StackPusk(stack, x);
+
                 }
-                else if (item != "/")
-                    stack.Push(new SoLon(item));
+                else
+                    stack.Push(item);
             }
             return stack.Pop().ToString();
         }
@@ -185,9 +153,21 @@ namespace BieuThucTrungToSoLonConsole
             return (s == "+" || s == "-" || s == "*" || s == "^");
         }
         //in ket quả
-        public override string ToString()
+        public string InManHinh()
         {
-            return Input.ToString() + "= " + PrintScreenRessults() + "=" + Expressions().ToString();
+            var s = "";
+            foreach (var item in items)
+            {
+                s += item;
+            }
+            s += "=";
+            foreach (var item in PrintScreenRessults())
+            {
+                s += item + " ";
+            }
+            s += " = " + Expressions();
+            return s;
+
         }
     }
 }

@@ -8,25 +8,6 @@ using System.Threading.Tasks;
 
 namespace BieuThucTrungToSoLonConsole
 {
-    public static class String_Ext
-    {
-        public static string[] SplitOnGroups(this string str, string pattern)
-        {
-            var matches = Regex.Matches(str, pattern);
-            var partsList = new List<string>();
-            for (var i = 0; i < matches.Count; i++)
-            {
-                var groups = matches[i].Groups;
-                for (var j = 0; j < groups.Count; j++)
-                {
-                    var group = groups[j];
-                    partsList.Add(group.Value);
-                }
-            }
-            return partsList.ToArray();
-        }
-    }
-
     class Program
     {
         //ghi file
@@ -57,60 +38,10 @@ namespace BieuThucTrungToSoLonConsole
             rd.Close();
             return list;
         }
-
-
-
         static void Main(string[] args)
         {
-            var chuoi1 = "(153613131313131231*372323526353226+323)*322323232323232323";
-
-            string[] sep = { "+", "-", "*", ")",   "(", "^", "/" };
-         
-
-
-            //var list = DocFile("a");
-            //foreach (var item in list)
-            //{
-            //    var sss = new ChuyenTrungToSangHauTo(item);
-            //    GhiFile(sss.ToString());
-            //}
-            //var S = new List<object>();
-            //var chuoi = "(153613131313131231 * 372323526353226 + 323) * 322323232323232323";
-            //string[] toanTu = { "+", "-", "*", ")", "", "(", "^", "/" };
-            //var so = "";
-            //int i = 0;
-            //var cacSoLon = chuoi.Split(toanTu, StringSplitOptions.RemoveEmptyEntries);
-            //foreach (var item in chuoi)
-            //{
-            //    if (item == ' ')
-            //        continue;
-            //    so += item;
-            //    if (item == ')')
-            //    {
-            //        S.Add(item);
-            //        so = "";
-            //    }
-            //    if (item == '(')
-            //    {
-            //        S.Add(item);
-            //        so = "";
-            //    }
-            //  if(item=='*')
-            //  {
-            //      S.Add(item);
-            //      so = "";
-            //  }
-            //    if (so == cacSoLon[i])
-            //    {
-            //        S.Add(so);
-            //        so = "";
-            //        i++;
-            //    }
-            //}
-
-            //Console.WriteLine();
-
-
+            var s = new ChuyenTrungToSangHauTo("2*4+4+");
+            Console.WriteLine(s.InManHinh());
             Console.ReadKey();
         }
     }

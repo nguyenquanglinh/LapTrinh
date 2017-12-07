@@ -33,13 +33,13 @@ namespace BieuThucTrungToSoLonConsole
             arr = new int[s.Length];
             if (s.Length < 1)
                 arr = new int[1];
-            var ss = new ChuyenTrungToSangHauTo(s);
+          
             for (int i = 0; i < s.Length; i++)
             {
                 //can kt toan tu
-                if (ChuyenTrungToSangHauTo.IsNumber(s[i]))
+                if (Char.IsNumber(s[i]))
                     arr[i] = int.Parse(s[s.Length - 1 - i].ToString());
-                if (!ChuyenTrungToSangHauTo.IsNumber(s[i]) && i > 0)
+                if (!Char.IsNumber(s[i]) && i > 0)
                     throw new ArgumentException("đây là biểu thức sai");
             }
             arr = arr.Reverse().ToArray();
