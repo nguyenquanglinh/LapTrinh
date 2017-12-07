@@ -9,48 +9,38 @@ namespace BieuThucTrungToSoLonConsole
 {
     public class ChuyenTrungToSangHauTo
     {
-        char[] mangChar;
-        string chuoi;
+        List<object> items = new List<object>();
+        private static List<object> SplitItem(string str)
+        {
+            string[] sep = { "+", "-", "*", ")", "(", "^", "/" };
+
+            foreach (var item in sep)
+            {
+                str = str.Replace(item, " " + item + " ");
+            }
+            var arr = str.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            var result = new List<object>();
+            foreach (var item in arr)
+            {
+                if ('0' <= item[0] && item[0] <= '9')
+                    result.Add(new SoLon(item));
+                else
+                    result.Add(item);
+            }
+            return result;
+        }
 
         //hàm tạo truyền đầu vào
         public ChuyenTrungToSangHauTo(string s)
         {
-            Input = s;
-            ChuyenDoi = chuoi.ToCharArray();
+            if (!IsCorrectString(s))
+                throw new ArgumentException("Chuoi khong hop le");
+            items = SplitItem(s);
         }
 
-        //lấy kết quả đầu vào của hàm tạo
-        string Input
-        {
-            get
-            {
-                return chuoi;
-            }
-            set
-            {
-                chuoi = value;
-                //chưa biết có những lỗi gì
-
-            }
-        }
-
-        //chuyển từ string sang char[]
-        char[] ChuyenDoi
-        {
-            get
-            {
-                return mangChar;
-            }
-            set
-            {
-                mangChar = value;
-                if (!IsCorrectString(value))
-                    throw new Exception("bạn đã nhập sai biểu thức cần kiểm tra lại");
-            }
-        }
 
         //kiểm tra chuỗi đúng
-        bool IsCorrectString(char[] mangChar)
+        static bool IsCorrectString(string mangChar)
         {
             int mo = 0, dong = 0;
             for (int i = 0; i < mangChar.Length; i++)
@@ -65,60 +55,37 @@ namespace BieuThucTrungToSoLonConsole
             return mo - dong == 0;
         }
 
-        //toán tử
-        bool IsOperator(char Char)
-        {
-            if (Char == '+' || Char == '-' || Char == '*' || Char == '/' || Char == '%' || Char == '^' || Char == '!')
-                return true;
-            return false;
-        }
-
-        //số đếm
-        public bool IsNumber(Char Char)
-        {
-            if (Char == '9' || Char == '8' || Char == '7' || Char == '6' || Char == '5' || Char == '4' || Char == '3' || Char == '2' || Char == '1' || Char == '0')
-                return true;
-            return false;
-        }
-
         //độ ưu tiên toán tử
-        int Priority(char Char)
+        static int Priority(string Char)
         {
-            if (Char == '%' || Char == '^')
+            if (Char == "%" || Char == "^")
                 return 3;
-            if (Char == '*' || Char == '/')
+            if (Char == "*" || Char == "/")
                 return 2;
-            if (Char == '+' || Char == '-')
+            if (Char == "+" || Char == "-")
                 return 1;
             return 0;
         }
 
         //in ra hau to
-        public string PrintScreenRessults()
+        public List<object> PrintScreenRessults()
         {
-            if (!IsCorrectString(mangChar))
-                throw new Exception("nhap sai mang");
+            List<object> result = new List<object>();
             var stack = new Stack<object>();
             var ressults = "";
-            foreach (var item in mangChar)
+            foreach (var item in items)
             {
-                if (item == ' ')
-                    continue;
-                else if (IsNumber(item))
-                {
-                    ressults += " " + item + " ";
-                }
-                else if (item == '(')
+                if (item == "(")
                 {
                     stack.Push(item);
 
                 }
-                else if (item == ')')
+                else if (item == ")")
                 {
                     var kqTrongStack = stack.Pop();
-                    while ((char)kqTrongStack != '(')
+                    while (kqTrongStack != "(")
                     {
-                        ressults += " " + kqTrongStack;
+                        result.Add(kqTrongStack);
                         kqTrongStack = stack.Pop();
                     }
                 }
@@ -127,72 +94,44 @@ namespace BieuThucTrungToSoLonConsole
 
                     while (stack.Count > 0 && Priority(item) <= Priority((char)stack.Peek()))
                     {
-                        ressults += " " + stack.Pop();
+                        ressults += stack.Pop();
                     }
                     stack.Push(item);
                 }
             }
             while (stack.Count > 0)
             {
-                ressults += " " + stack.Pop();
+                ressults += stack.Pop();
             }
-            ressults = ChuyenVeChuoiDung(ressults);
+            var s = ressults.ToCharArray();
+            ressults = ChuyenVeChuoiDung(s);
             return ressults;
         }
-        string ChuyenVeChuoiDung(string ressults)
+
+        string ChuyenVeChuoiDung(char[] ressults)
         {
             string[] toanTu = { "+", "-", "*", "(", ")", "^", "/" };
-            var s1s = chuoi.Split(toanTu, StringSplitOptions.RemoveEmptyEntries);
-            string[] daucach = { "", " " };
-            var ss = ressults.Split(daucach, StringSplitOptions.RemoveEmptyEntries);
-            ressults = "";
+            var cacSoLon = chuoi.Split(toanTu, StringSplitOptions.RemoveEmptyEntries);
+            var ressults1 = "";
             var s = "";
             int j = 0;
-            foreach (var item in ss)
+            foreach (var item in ressults)
             {
                 s += item;
-                if (IsOperatorString(item))
+                if (IsOperator(item))
                 {
-                    ressults += " " + item;
+                    ressults1 += " " + item;
                     s = "";
                 }
-
-                else if (s == s1s[j])
+                else if (s == cacSoLon[j])
                 {
-                    ressults += " " + s + " ";
+                    ressults1 += " " + s + " ";
                     s = "";
                     j++;
                 }
             }
-            return ressults;
+            return ressults1;
         }
-        // vi tri toan tu
-        int TimViTriToanTu(string s, int x)
-        {
-            for (int i = x; i < s.Length; i++)
-            {
-                var sss = s[i];
-                if (IsOperator(s[i]))
-                    return i;
-            }
-            return 0;
-        }
-        //viết chuỗi-chưa làm
-        string CongChuoi(string s, int x)
-        {
-            if (x == 0)
-                x = chuoi.Length - 1;
-            var ret = "";
-            for (int i = 0; i < x; i++)
-            {
-                if (IsNumber(chuoi[i]))
-                    ret += chuoi[i];
-            }
-            chuoi = chuoi.Remove(0, x + 1);
-
-            return ret;
-        }
-
 
         ////phep toan ket qua
         public string Expressions()
@@ -230,7 +169,7 @@ namespace BieuThucTrungToSoLonConsole
                     {
                         var x1 = (SoLon)stack.Pop();
                         var x2 = (SoLon)stack.Pop();
-                        var x3 = x2 + x1;
+                        var x3 = x2 ^ x1;
                         stack.Push(x3);
                     }
                 }

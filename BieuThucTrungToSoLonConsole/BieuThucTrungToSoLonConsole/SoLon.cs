@@ -10,7 +10,7 @@ namespace BieuThucTrungToSoLonConsole
     {
         string chuoi;
         public int[] arr;
-        public int[]MangCoban
+        public int[] MangCoban
         {
             get
             {
@@ -24,6 +24,7 @@ namespace BieuThucTrungToSoLonConsole
         // ham tao chuoi
         public SoLon(string s)
         {
+
             if (s != "" && s[0] == '-')
             {
                 LasoAm = true;
@@ -36,9 +37,9 @@ namespace BieuThucTrungToSoLonConsole
             for (int i = 0; i < s.Length; i++)
             {
                 //can kt toan tu
-                if (ss.IsNumber(s[i]))
+                if (ChuyenTrungToSangHauTo.IsNumber(s[i]))
                     arr[i] = int.Parse(s[s.Length - 1 - i].ToString());
-                if (!ss.IsNumber(s[i]) && i > 0)
+                if (!ChuyenTrungToSangHauTo.IsNumber(s[i]) && i > 0)
                     throw new ArgumentException("đây là biểu thức sai");
             }
             arr = arr.Reverse().ToArray();
@@ -108,6 +109,7 @@ namespace BieuThucTrungToSoLonConsole
 
             if (a.Length < max)
                 a = MakeSameLength(a, max);
+
             if (b.Length < max)
                 b = MakeSameLength(b, max);
             var nho = 0;
@@ -274,8 +276,9 @@ namespace BieuThucTrungToSoLonConsole
         }
 
         //phep gia thừa
-        public SoLon GiaiThua(SoLon a)
+        public SoLon GiaiThua()
         {
+            var a = this;
             var ret = new SoLon("1");
             while (!a.Equals(new SoLon("1")))
             {
@@ -290,26 +293,29 @@ namespace BieuThucTrungToSoLonConsole
         {
             if (a.LasoAm)
                 return null;
-            //return GiaiThua(a);
-            return null;
+            return a.GiaiThua(); 
         }
 
         //phep mu
-        static SoLon Mu(SoLon a, int mu)
+        static SoLon Mu(SoLon a, SoLon mu)
         {
-            var s = new SoLon("1");
-            for (int i = 0; i < mu; i++)
+            var ret = new SoLon("1");
+            var donVi = new SoLon("1");
+            var dem = new SoLon("0");
+            while (!dem.Equals(mu))
             {
-                s = s * a;
+                ret = ret * a;
+                dem = dem + donVi;
             }
-            return s;
+            return ret;
         }
 
         //phep ^
-        public static SoLon operator ^(SoLon a, int mu)
+        public static SoLon operator ^(SoLon a, SoLon mu)
         {
             return Mu(a, mu);
         }
+
         //so do dai ,gia tri cua tung phan tu trong mang
         public int Compareto(SoLon b)
         {
@@ -319,7 +325,7 @@ namespace BieuThucTrungToSoLonConsole
                 return 1;
             else if (ar.Length < br.Length)
                 return -1;
-            else if (ar.Length == br.Length)
+            else  
             {
                 for (int i = 0; i < ar.Length; i++)
                 {
@@ -329,9 +335,7 @@ namespace BieuThucTrungToSoLonConsole
                         return -1;
                 }
                 return 0;
-            }
-
-            throw new NotImplementedException();
+            } 
         }
 
         //tao do dai mang = nhau
@@ -344,23 +348,7 @@ namespace BieuThucTrungToSoLonConsole
             }
             return x;
         }
-
-        //thuoc tinh
-        string Chuoi
-        {
-            get
-            {
-                return chuoi;
-            }
-            set
-            {
-                chuoi = value;
-                if (string.IsNullOrEmpty(value))
-                    throw new Exception("bạn đã nhập sai chuỗi");
-            }
-        }
-
-
+        
         // them 1 so khong vao mang==*10
         static int[] Them10DonViChoSo(int[] a, int donVi)
         {
