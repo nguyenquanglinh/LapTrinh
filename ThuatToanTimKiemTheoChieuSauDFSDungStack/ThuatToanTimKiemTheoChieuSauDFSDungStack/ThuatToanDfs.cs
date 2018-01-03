@@ -10,6 +10,8 @@ namespace ThuatToanTimKiemTheoChieuSauDFSDungStack
         int[,] arr;
         public ThuatToanDfs(int[,] a)
         {
+            dinhDaDuyet = new int[20];
+            Dinh = new List<int>();
             arr = a;
         }
         public int[,] ARR
@@ -31,6 +33,7 @@ namespace ThuatToanTimKiemTheoChieuSauDFSDungStack
         {
             arr = new int[doDaiCanh, doDaiCanh];
             Nhap();
+
         }
 
         private void Nhap()
@@ -55,24 +58,38 @@ namespace ThuatToanTimKiemTheoChieuSauDFSDungStack
             }
             return false;
         }
-
+        public int[] dinhDaDuyet { get; set; }
+        public List<int> Dinh { get; set; }
+        public void DinhDangDuyet(int dinh)
+        {
+            Dinh.Add(dinh);
+            for (int i = 0; i < arr.GetLength(0); i++)
+            {
+                if (arr[dinh, i] == 1 && dinhDaDuyet[i] == 0)
+                {
+                    dinhDaDuyet[dinh] = 22;
+                    DinhDangDuyet(i);
+                }
+            }
+        }
         public List<int> ThuTuDuyetDinh(int dinh)
         {
-            var stack = new Stack<int>();
+            //var stack = new Stack<int>();
             var list = new List<int>();
-            var dinhDangDuyet = new int[arr.GetLength(0)];
-            stack.Push(dinh);
-            while (stack.Count != 0)
+
+            //stack.Push(dinh);
+            //while (stack.Count != 0)
             {
-                var dinhRa = stack.Pop();
-                list.Add(dinhRa);
+                //var dinhRa = stack.Pop();
+                //list.Add(dinhRa);
+                var dinhRa = dinh;
+                list.Add(dinh);
                 for (int i = 0; i < arr.GetLength(0); i++)
                 {
-                    if (arr[dinhRa, i] == 1 && dinhDangDuyet[i] == 0)
+                    if (arr[dinhRa, i] == 1 && dinhDaDuyet[i] == 0)
                     {
-                        dinhDangDuyet[dinhRa] = i;
-                        stack.Push(i);
-
+                        dinhDaDuyet[i] = 22;
+                        var s = ThuTuDuyetDinh(i);
                     }
                 }
             }
@@ -99,14 +116,19 @@ namespace ThuatToanTimKiemTheoChieuSauDFSDungStack
             return list;
         }
 
-         
-
         public int DemCanhDoThi(int dinh)
         {
             var list = ThuTuDuyetDinh(dinh);
             if (list == null)
                 return 0;
             return list.Count - 1;
+        }
+
+
+        internal void  clear()
+        {
+            dinhDaDuyet = new int[20];
+            Dinh = new List<int>();
         }
     }
 }
