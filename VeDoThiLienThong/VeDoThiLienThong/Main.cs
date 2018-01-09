@@ -25,63 +25,41 @@ namespace VeDoThiLienThong
         private void DoThiLienThong_MouseUp(object sender, MouseEventArgs e)
         {
             dt.ThemDinh(e.Location.X, e.Location.Y);
-
+            btnTimDuong.Enabled = true;
         }
-
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
         }
 
-        private void btnDoc_Click(object sender, EventArgs e)
-        {
-            dt.DocFile();
-            MessageBox.Show("file đã được đọc");
-        }
-
-        private void btnVe_Click(object sender, EventArgs e)
-        {
-            dt.VeLaiFile();
-
-            MessageBox.Show("hoàn thành");
-        }
-
         private void btnLuu_Click(object sender, EventArgs e)
         {
             dt.LuuFile();
-
-            MessageBox.Show("hoàn thành");
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-
-            var list = dt.ThuTuDinhDuyet(1);
-            foreach (var item in list)
-            {
-                MessageBox.Show(item.ToString());
-            }
-        }
-
-        private void btnDem_Click(object sender, EventArgs e)
-        {
-            var soDothi = dt.DemDoThi();
-            MessageBox.Show("canh cua do thi la "+(soDothi.Count.ToString()));
-        }
-
-        private void btnSoCanh_Click(object sender, EventArgs e)
-        {
-            dt.DemCanhCuaDoThi();
-        }
-
-        private void button1_Click_1(object sender, EventArgs e)
-        {
-            dt.VeLaiFile();
+            var f2 = new Form2(dt);
+            f2.Show();
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
             dt.ToMau();
+        }
+
+        private void button1_Click_2(object sender, EventArgs e)
+        {
+            dt.DocFile();
+            MessageBox.Show("hoàn thành");
+            btnTimDuong.Enabled = true;
+        }
+
+        private void btnTimDuong_Click(object sender, EventArgs e)
+        {
+            var f3 = new TimDuong(dt);
+            f3.Show();
+            this.Enabled = true;
         }
     }
 }

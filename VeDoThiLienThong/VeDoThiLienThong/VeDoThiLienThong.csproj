@@ -46,12 +46,17 @@
   <ItemGroup>
     <Compile Include="canh.cs" />
     <Compile Include="DoThi.cs" />
-    <Compile Include="FileText.cs" />
     <Compile Include="Main.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Main.Designer.cs">
       <DependentUpon>Main.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DuyetDinh.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DuyetDinh.Designer.cs">
+      <DependentUpon>DuyetDinh.cs</DependentUpon>
     </Compile>
     <Compile Include="HinhTron.cs">
       <SubType>UserControl</SubType>
@@ -61,8 +66,17 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TimDuong.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TimDuong.Designer.cs">
+      <DependentUpon>TimDuong.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Main.resx">
       <DependentUpon>Main.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DuyetDinh.resx">
+      <DependentUpon>DuyetDinh.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="HinhTron.resx">
       <DependentUpon>HinhTron.cs</DependentUpon>
@@ -76,6 +90,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="TimDuong.resx">
+      <DependentUpon>TimDuong.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

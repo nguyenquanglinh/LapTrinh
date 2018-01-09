@@ -9,36 +9,62 @@ using System.Windows.Forms;
 
 namespace VeDoThiLienThong
 {
-    class DoThi
+
+    public class Hinh
+    {
+        public Hinh()
+        {
+            tapDinh = new List<HinhTron>();
+            tapCanh = new List<Canh>();
+        }
+        public List<HinhTron> tapDinh;
+        public List<Canh> tapCanh;
+    }
+
+    public class DoThi
     {
         #region biến toàn cục
         Form form;
-        List<HinhTron> tapDinh;
+        List<HinhTron> tapDinhDt;
         List<Canh> tapCanh;
 
+        public List<string> tenDinh()
+        {
+            var tenDinh = new List<string>();
+            foreach (var item in tapDinhDt)
+            {
+                tenDinh.Add(item.Ten);
+            }
+            return tenDinh;
+        }
         int[,] arr;
-        List<int> list;
+
         HinhTron lastedClick = null;
+
         #endregion
 
-        #region hàm tạo
-        //các hàm ngoài có thể dùng
+        #region hàm tạo vẽ
+
         // 1 hàm tạo đồ thị từ form
         public DoThi(Form f1)
         {
             form = f1;
             tapCanh = new List<Canh>();
-            tapDinh = new List<HinhTron>();
+            tapDinhDt = new List<HinhTron>();
             f1.Paint += f1_Paint;
         }
+
+        
+
         //kiem tra hinh tron da co
         bool OverLapHt(HinhTron ht)
         {
-            foreach (var item in this.tapDinh)
+            foreach (var item in this.tapDinhDt)
                 if (ht.Overlap(item))
                     return true;
             return false;
         }
+
         //vẽ hình tròn bằng tọa độ x,y
         public void ThemDinh(int x, int y)
         {
@@ -46,41 +72,48 @@ namespace VeDoThiLienThong
             //....
             if (OverLapHt(ht))
                 return;
-            if (!tapDinh.Contains(ht))
+            if (!tapDinhDt.Contains(ht))
             {
-                tapDinh.Add(ht);
+                tapDinhDt.Add(ht);
+                NewArr();
                 form.Controls.Add(ht);
             }
             ht.Click += a_Click;
             ht.DoubleClick += ht_DoubleClick;
+            GhiTenDinhLenHinhTron();
+
+        }
+
+        void NewArr()
+        {
+            arr = new int[tapDinhDt.Count, tapDinhDt.Count];
+            foreach (var item in tapCanh)
+            {
+                arr[int.Parse(item.DiemDau.Ten), int.Parse(item.DiemCuoi.Ten)] = arr[int.Parse(item.DiemCuoi.Ten), int.Parse(item.DiemDau.Ten)] = 1;
+            }
         }
 
         //thêm cạnh vào tập cạnh từ ht a ht b
         public void ThemCanh(Canh canh)
         {
-            foreach (var item in tapCanh)
-            {
-                if (item.Equals(canh))
-                    return;
-            }
-            foreach (var item in tapDinh)
-            {
-                if (item.Equals(canh.DiemDau) || item.Equals(canh.DiemCuoi))
-                    continue;
-            }
+
 
             if (!tapCanh.Contains(canh))
             {
-
                 tapCanh.Add(canh);
+                NewArr();
                 canh.DiemDau.Color = Color.Blue;
                 canh.DiemCuoi.Color = Color.Blue;
             }
+            else
+            {
+                canh.DiemCuoi.Color = Color.Blue;
+                canh.DiemDau.Color = Color.Blue;
+            }
+
             form.Invalidate();
         }
 
-
-        int demDinh;
         //vẽ ht trên form liên tục
         public void Draw()
         {
@@ -90,28 +123,25 @@ namespace VeDoThiLienThong
             {
                 VeCanh(item);
             }
-
         }
-
-        #endregion
-
-        #region vẽ hình cạnh thêm đỉnh
-
-        void GhiTenDinhLenHinhTron()
-        {
-            demDinh = 0;
-            foreach (var ht in tapDinh)
-            {
-                ht.Ten = demDinh.ToString();
-                demDinh++;
-            }
-        }
-
         //hàm vẽ
         void f1_Paint(object sender, PaintEventArgs e)
         {
             this.Draw();
+        }
+        #endregion
 
+        #region vẽ hình cạnh thêm đỉnh
+
+        int demDinh;
+        void GhiTenDinhLenHinhTron()
+        {
+            demDinh = 0;
+            foreach (var ht in tapDinhDt)
+            {
+                ht.Ten = demDinh.ToString();
+                demDinh++;
+            }
         }
 
         //vẽ hình tròn =ht truyền vào
@@ -120,7 +150,6 @@ namespace VeDoThiLienThong
             var ht = new HinhTron() { Location = new Point(x, y) };
             ht.Color = Color.Blue;
             return ht;
-
         }
 
         //xóa hình tròn khi double.click
@@ -128,20 +157,18 @@ namespace VeDoThiLienThong
         {
             demDinh--;
             var ht = sender as HinhTron;
-            for (int i = 0; i < tapDinh.Count; i++)
+            for (int i = 0; i < tapDinhDt.Count; i++)
             {
-                if (ht.Equals(tapDinh[i]))
+                if (ht.Equals(tapDinhDt[i]))
                 {
-                    tapDinh.RemoveAt(i);
+                    tapDinhDt.RemoveAt(i);
                 }
             }
             XoaCanh(ht);
             lastedClick = null;
             form.Controls.Remove(ht);
-
             form.Invalidate();
         }
-
 
         //xóa cạnh của hình tròn khi xóa 1 đỉnh của hình tròn
         void XoaCanh(HinhTron a)
@@ -174,7 +201,8 @@ namespace VeDoThiLienThong
             ThemCanh(canh);
             lastedClick = null;
         }
-        //nối các 2 định của 1 cạnh trong tập cạnh
+
+        //vẽ cạnh trong tập cạnh
         private void VeCanh(Canh canh)
         {
             var dDau = canh.DiemDau;
@@ -208,234 +236,129 @@ namespace VeDoThiLienThong
             return false;
         }
 
-        internal List<List<int>> DemDoThi()
+        internal List<Hinh> DemDoThi()
         {
-            var soDothi = new List<List<int>>();
+            //kiểm tra có bao nhiêu đồ thị liên thông
+            var soDothi = new List<Hinh>();
+
             var caDinhDangDuyet = ThuTuDinhDuyet(0);
-            if (caDinhDangDuyet != null)
+            if (caDinhDangDuyet.tapDinh[0] != null)
                 soDothi.Add(caDinhDangDuyet);
+            var sss = arr.GetLength(0);
             for (int i = 1; i < arr.GetLength(0); i++)
             {
                 if (!KiemTraDinhDaDuyet(soDothi, i))
                 {
                     caDinhDangDuyet = ThuTuDinhDuyet(i);
-                    if (caDinhDangDuyet != null)
+                    if (caDinhDangDuyet.tapDinh[0] != null)
                         soDothi.Add(caDinhDangDuyet);
                 }
             }
             return soDothi;
+            //trả về số đồ  thị liên thông
 
         }
 
-        bool KiemTraDinhDaDuyet(List<List<int>> a, int DinhCanKiemTra)
+        bool KiemTraDinhDaDuyet(List<Hinh> listHinh, int DinhCanKiemTra)
         {
-            foreach (var item in a)
-            {
-                foreach (var Dinh in item)
-                {
-                    if (Dinh == DinhCanKiemTra)
+            foreach (var hinh in listHinh)
+                foreach (var Dinh in hinh.tapDinh)
+                    if (Dinh.Ten == DinhCanKiemTra.ToString())
                         return true;
-                }
-            }
             return false;
         }
 
-        internal void DemCanhCuaDoThi()
+        public Hinh ThuTuDinhDuyet(int dinhDuyet)
         {
-            var soDoThi = DemDoThi();
-            foreach (var item in soDoThi)
-            {
-                MessageBox.Show(item.Count.ToString());
-            }
+            var hinh = new Hinh();
+            var dinhDaDuyet = new int[arr.GetLength(0)];
+            DuyetDinh(dinhDuyet, hinh, dinhDaDuyet);
+            return hinh;
         }
 
-        public List<int> ThuTuDinhDuyet(int dinhDuyet)
+        public void DuyetDinh(int dinh, Hinh hinh, int[] dinhDaDuyet)
         {
-            int dinh = dinhDuyet;
-            var stack = new Stack<int>();
-            list = new List<int>();
-            var dinhDangDuyet = new int[arr.GetLength(0)];
-            stack.Push(dinh);
-            while (stack.Count != 0)
-            {
-                var dinhRa = stack.Pop();
-                list.Add(dinhRa);
-                for (int i = 0; i < arr.GetLength(0); i++)
-                    if (arr[dinhRa, i] == 1 && dinhDangDuyet[i] == 0)
-                    {
-                        dinhDangDuyet[dinhRa] = 11;
-                        stack.Push(i);
-                    }
-            }
-            if (list.Count > 1)
-                return list;
-            return null;
-        }
-
-        #endregion
-
-        #region chưa làm được
-
-        private void GhiFileArr()
-        {
-            string path = "D:\\Output.txt";
-            if (File.Exists(path))
-            {
-                File.Delete(path);
-            }
-
-            if (tapDinh.Count > 0)
-            {
-                string appendText = tapDinh.Count + Environment.NewLine;
-                File.AppendAllText(path, appendText);
-            }
-            foreach (var item in tapCanh)
-            {
-                var dDau = (item.DiemDau.Ten);
-                var dCuoi = (item.DiemCuoi.Ten);
-                var s = dDau + " " + dCuoi;
-                string appendText = s + Environment.NewLine;
-                File.AppendAllText(path, appendText);
-            }
-        }
-
-        //đọc và thêm dữ liệu lên arr-chưa dùng
-        public void DocFile()
-        {
-            string path = "D:\\Output.txt";
-            FileStream fs = new FileStream(path, FileMode.Open);
-            StreamReader rd = new StreamReader(fs, Encoding.UTF8);
-            string fileString = rd.ReadToEnd();
-            if (string.IsNullOrEmpty(fileString))
-            {
-                MessageBox.Show("file rỗng");
-                return;
-            }
-            var xx = fileString.Split('\r');
-            var soDinh = 0;
-            if (xx[0] != "\t")
-                soDinh = int.Parse(xx[0]);
-            arr = new int[soDinh + 1, soDinh + 1];
-            for (int i = 1; i < xx.Length; i++)
-            {
-                if ((xx[i]) != "\n")
-                {
-                    var dong = xx[i].Split(' ');
-                    arr[int.Parse(dong[0]), int.Parse(dong[1])] = 1;
-                    arr[int.Parse(dong[1]), int.Parse(dong[0])] = 1;
-                    var canh = ThemCanhTuTenDinh(int.Parse(dong[0]), int.Parse(dong[1]));
-                    ThemCanh(canh);
-                }
-            }
-            rd.Close();
-        }
-        //hinh tron có đinh thu 
-        Canh ThemCanhTuTenDinh(int d1, int d2)
-        {
-            var canh = new Canh();
-            GhiTenDinhLenHinhTron();
-            foreach (var item in tapDinh)
-            {
-                if (int.Parse(item.Ten) == d1)
-                    canh.DiemDau = item;
-                if (int.Parse(item.Ten) == d2)
-                    canh.DiemCuoi = item;
-            }
-            return canh;
-        }
-
-        //chưa làm dk
-        public void ThemDinhTuFile()
-        {
-            var x = 0;
-            var y = 0;
+            var dD = LayHinhTron(dinh);
+            hinh.tapDinh.Add(dD);
+            dinhDaDuyet[dinh] = -1;
             for (int i = 0; i < arr.GetLength(0); i++)
             {
-                for (int j = 0; j < arr.GetLength(1); j++)
+                if (arr[dinh, i] == 1)
                 {
-                    if (arr[i, j] != 0)
-                    {
-                        ThemDinh(0 + x + 15, 0 + y + 30);
-                        arr[j, i] = 0;
-                        x = tapDinh[tapDinh.Count - 1].Center.X;
-                        y = tapDinh[tapDinh.Count - 1].Center.Y;
-                    }
+                    var dCuoi = LayHinhTron(i);
+                    var canh = new Canh(dD, dCuoi);
+                    if (!hinh.tapCanh.Contains(canh))
+                        hinh.tapCanh.Add(new Canh(dD, dCuoi));
+                    if (dinhDaDuyet[i] == 0)
+                        DuyetDinh(i, hinh, dinhDaDuyet);
                 }
+
             }
-
         }
-
         #endregion
 
         #region LuuFile LayFile
 
-        //ghi lại caic cạnh
-        //////private void GhiCanhVaoFile()
-        //////{
-        //////    if (tapCanh.Count > 0)
-        //////    {
-        //////        string path = "D:\\OutputCanhLocation.txt";
-        //////        if (File.Exists(path))
-        //////            File.Delete(path);
-        //////        foreach (var item in tapCanh)
-        //////        {
-        //////            var s = item.ToaDoCanh();
-        //////            string appendText = s + Environment.NewLine;
-        //////            File.AppendAllText(path, appendText);
-        //////        }
-        //////    }
-        //////}
-
         //ghi lại các đỉnh
-        void GhiDinhVaoFile()
+        void LuuDinhVaoFile()
         {
-            if (tapDinh.Count > 0)
+            if (tapDinhDt.Count > 0)
             {
-                string path = "D:\\OutputLocation.txt";
+                string path = "D:\\FileDinh.txt";
                 if (File.Exists(path))
                 {
                     File.Delete(path);
                 }
-                foreach (var item in tapDinh)
+                foreach (var item in tapDinhDt)
                 {
                     var x = item.Center.X;
                     var y = item.Center.Y;
                     var s = x + ";" + y;
                     string appendText = s + Environment.NewLine;
                     File.AppendAllText(path, appendText);
-
                 }
+                MessageBox.Show("Đã lưu đồ thị trên form");
             }
+            else
+                MessageBox.Show("trên form không có đồ thị");
         }
 
-        //ghi cạnh lên form
+        //  thêm cạnh từ file vào tập cạnh
         private void VeLaiCanh()
         {
-            string path = "D:\\OutputCanhLocation.txt";
+            string path = "D:\\FileArr.txt";
             if (!File.Exists(path))
             {
                 MessageBox.Show("file rỗng hoặc chưa được tạo");
                 return;
             }
             var xx = File.ReadAllLines(path);
-            foreach (var item in xx)
+            if (xx[0] == "")
+                return;
+            arr = new int[int.Parse(xx[0]), int.Parse(xx[0])];
+            for (int j = 1; j < xx.Length; j++)
             {
-                var s = item.Split(';');
-                if (s.Length == 4)
-                {
-                    var canh = new Canh();
-                    canh.DiemDau = VeHinhTron(int.Parse(s[0]), int.Parse(s[1]));
-                    canh.DiemCuoi = VeHinhTron(int.Parse(s[2]), int.Parse(s[3]));
-                    ThemCanh(canh); ;
-                }
+                var s = xx[j].Split(' ');
+                arr[int.Parse(s[0]), int.Parse(s[1])] = 1;
+                arr[int.Parse(s[1]), int.Parse(s[0])] = 1;
             }
-
         }
 
-        // vẽ lại  ht lên form từ file
+        HinhTron LayHinhTron(int ten)
+        {
+            foreach (var item in tapDinhDt)
+            {
+                if (item.Ten == ten.ToString())
+                    return item;
+            }
+            return null;
+        }
+
+        //    thêm đỉnh từ file lên form
+
         void VeLaiDinh()
         {
-            string path = "D:\\OutputLocation.txt";
+            string path = "D:\\FileDinh.txt";
 
             if (!File.Exists(path))
             {
@@ -449,7 +372,6 @@ namespace VeDoThiLienThong
             {
                 var s = item.Split(';');
                 ThemDinh(int.Parse(s[0]), int.Parse(s[1]));
-
             }
         }
 
@@ -459,28 +381,44 @@ namespace VeDoThiLienThong
         //lưu file có 2 hàm tọa độ và arr
         public void LuuFile()
         {
-            GhiDinhVaoFile();
-            //     GhiCanhVaoFile();
-            GhiFileArr();
+            LuuDinhVaoFile();
+            LuuFileArr();
         }
 
-        public void VeLaiFile()
+        private void LuuFileArr()
         {
-            VeLaiDinh();
-            VeLaiCanh();
+            string path = "D:\\FileArr.txt";
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+            if (arr.GetLength(0) == 0)
+            {
+                if (MessageBox.Show("bạn có muốn lưu file rỗng 0", "thông báo", MessageBoxButtons.OKCancel) == System.Windows.Forms.DialogResult.OK)
+                {
+                    string appendText1 = Environment.NewLine;
+                    File.AppendAllText(path, appendText1);
+                    string path1 = "D:\\FileDinh.txt";
+                    File.Delete(path1);
+
+                }
+            }
+            string appendText = arr.GetLength(0).ToString() + Environment.NewLine;
+            File.AppendAllText(path, appendText);
+
+            foreach (var item in tapCanh)
+            {
+                var appendTextcanh = item.DiemDau.Ten + " " + item.DiemCuoi.Ten + Environment.NewLine;
+                File.AppendAllText(path, appendTextcanh);
+            }
         }
+
         #endregion
 
-        static Random rd = new Random();
-        internal void ToMau()
+
+        Color Mau()
         {
-            VeLaiDinh();
-            DocFile();
-            var xxxxx = tapDinh[0];
-            var yyyyy = tapCanh[0];
-            //VeLaiFile();
             Random rd = new Random();
-            var soDoThi = DemDoThi();
             var list = new List<Color>();
             list.Add(Color.Blue);
             list.Add(Color.Red);
@@ -489,40 +427,190 @@ namespace VeDoThiLienThong
             list.Add(Color.Purple);
             list.Add(Color.PowderBlue);
             list.Add(Color.BurlyWood);
-            VeLaiDinh();
-            
+            return list[rd.Next(0, list.Count)];
+        }
+
+        internal void ToMau()
+        {
+            if (tapDinhDt.Count == 0)
+            {
+                MessageBox.Show("file chưa được đọc cần đọc file");
+                return;
+            }
+            var soDoThi = DemDoThi();
+            ToMauCacDoThi(soDoThi);
+
+        }
+
+        public void ToMauCacDoThi(List<Hinh> soDoThi)
+        {
             foreach (var item in soDoThi)
             {
+                var color = Mau();
+                VeCacCanhTren1DoThi(item, color);
+            }
+        }
 
-                var xx = list[rd.Next(0, list.Count)];
-                VeCacCanhTren1DoThi(item, xx);
-                foreach (var Dinh in item)
+        public void ToMauMotDoThi(Hinh dothi)
+        {
+            var color = Mau();
+            VeCacCanhTren1DoThi(dothi, color);
+        }
+
+        void VeCacCanhTren1DoThi(Hinh doThi, Color color)
+        {
+
+            foreach (var item in doThi.tapCanh)
+            {
+                item.DiemCuoi.Color = color;
+                VeCanh(item);
+            }
+            foreach (var Dinh in doThi.tapDinh)
+                Dinh.Color = color;
+
+        }
+
+        internal void DocFile()
+        {
+            DocFileDinh();
+            DocFileArr();
+        }
+
+        private void DocFileDinh()
+        {
+            VeLaiDinh();
+        }
+
+        private void DocFileArr()
+        {
+            VeLaiCanh();
+        }
+
+        public Hinh TimDuong(int bd, int kt)
+        {
+            var doThi = DemDoThi();
+            var ret = new Hinh();
+            foreach (var item in doThi)
+                if (CoDuongDi(item, bd) && CoDuongDi(item, kt))
                 {
-                    var kt = KiemTraDinh(Dinh);
-                    kt.Color = xx;
+                    ret = item;
+                    ToMauMotDoThi(ret);
+                }
+            return ret;
+        }
+
+        int LayTenDinh(Canh canh, int bd)
+        {
+            if (canh.DiemDau.Ten == bd.ToString())
+                return int.Parse(canh.DiemCuoi.Ten);
+            return int.Parse(canh.DiemDau.Ten);
+        }
+
+        List<int> DinhDaDuyet(List<int> daDuyet)
+        {
+            var dinhDaDuyet = new List<int>();
+            foreach (var item in daDuyet)
+            {
+                dinhDaDuyet.Add(item);
+            }
+            return dinhDaDuyet;
+        }
+
+        void LayDuongDi(int bd, int kt, Hinh dothi, List<Hinh> tapDuongDi, Hinh duongMin, List<Canh> cacCanhKe, List<int> dinhDaDuyet)
+        {
+            var cacCanhKeDinhMoi = LayCanhTuHinh(dothi, bd, cacCanhKe);
+            var dinhDuyet = DinhDaDuyet(dinhDaDuyet);
+            foreach (var item in cacCanhKeDinhMoi)
+            {
+                var hinhMoi = new Hinh();
+                var dinhMoi = LayTenDinh(item, bd);
+                if (!duongMin.tapCanh.Contains(item))
+                {
+                    if (DinhDaDuocDuyet(dinhMoi, dinhDuyet))
+                        continue;
+                    dinhDuyet.Add(bd);
+                    foreach (var dinh in duongMin.tapDinh)
+                    {
+                        hinhMoi.tapDinh.Add(dinh);
+                    }
+                    foreach (var dinh in duongMin.tapCanh)
+                    {
+                        hinhMoi.tapCanh.Add(dinh);
+                    }
+                    hinhMoi.tapDinh.Add(LayHinhTron(bd));
+                    hinhMoi.tapCanh.Add(item);
+                    if (dinhMoi == kt)
+                    {
+                        hinhMoi.tapDinh.Add(LayHinhTron(kt));
+                        tapDuongDi.Add(hinhMoi);
+                        continue;
+                    }
+
+                    LayDuongDi(dinhMoi, kt, dothi, tapDuongDi, hinhMoi, cacCanhKeDinhMoi, dinhDuyet);
                 }
             }
         }
-        void VeCacCanhTren1DoThi(List<int> doThi, Color color)
-        {
-            foreach (var dinh in doThi)
-            {
-                foreach (var diem in tapCanh)
-                {
-                    if (int.Parse(diem.DiemCuoi.Ten) == dinh || int.Parse(diem.DiemDau.Ten) == dinh)
-                        VeCanh(diem);
-                }
-            }
 
-        }
-        HinhTron KiemTraDinh(int a)
+        bool DinhDaDuocDuyet(int dinh, List<int> dinhDaDuyet)
         {
-            for (int i = 0; i < tapDinh.Count; i++)
+            foreach (var item in dinhDaDuyet)
             {
-                if (int.Parse(tapDinh[i].Ten) == a)
-                    return tapDinh[i];
+                if (item == dinh)
+                    return true;
             }
-            return null;
+            return false;
+        }
+
+        Hinh HinhMin(Hinh hinhMoi, Hinh Hinh)
+        {
+            if (hinhMoi.tapCanh.Count > Hinh.tapCanh.Count)
+                return Hinh;
+            return hinhMoi;
+        }
+
+        List<Canh> LayCanhTuHinh(Hinh dothi, int ten, List<Canh> cacCanhKe)
+        {
+            var cacCanhKeDinhMoi = new List<Canh>();
+            foreach (var item in dothi.tapCanh)
+                if (item.DiemDau.Ten == ten.ToString() || item.DiemCuoi.Ten == ten.ToString())
+                {
+                    var canh = new Canh();
+                    canh = item;
+                    if (!cacCanhKe.Contains(canh))
+                        cacCanhKeDinhMoi.Add(canh);
+                }
+            return cacCanhKeDinhMoi;
+        }
+
+        bool CoDuongDi(Hinh dothi, int dinh)
+        {
+            if (dothi.tapDinh.Count < 2)
+                return false;
+
+            foreach (var item in dothi.tapDinh)
+                if (item.Ten == dinh.ToString())
+                    return true;
+            return false;
+        }
+
+        internal void TimDuongMin(int bd, int kt)
+        {
+            var dothi = TimDuong(bd, kt);
+            var cacDuongDi = new List<Hinh>();
+            LayDuongDi(bd, kt, dothi, cacDuongDi, new Hinh(), new List<Canh>(), new List<int>());
+            if (cacDuongDi.Count == 0)
+            {
+                MessageBox.Show("không có đường");
+                return;
+            }
+            var duongMin = cacDuongDi[0];
+            foreach (var duong in cacDuongDi)
+            {
+                if (duongMin.tapCanh.Count >= duong.tapCanh.Count)
+                    duongMin = duong;
+            }
+            ToMauMotDoThi(duongMin);
+            MessageBox.Show("đã tô màu đường đi từ" + bd.ToString() + "đến" + kt.ToString());
         }
     }
 }
